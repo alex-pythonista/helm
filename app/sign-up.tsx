@@ -7,21 +7,41 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { authClient } from "../auth-client";
 import { theme, sharedStyles } from "@/utils/theme";
+import { useRouter } from "expo-router";
 
 export default function App() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  const handleLogin = async () => {
-    await authClient.signUp.email({
-      email,
-      password,
-      name,
-    });
+  const handleSignUp = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+
+    try {
+      const result = await authClient.signUp.email({
+        email,
+        password,
+        name,
+      });
+
+      if (result.error) {
+        Alert.alert("Sign Up Failed", result.error.message || "Please try again");
+        return;
+      }
+
+      router.replace("/");
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -71,11 +91,14 @@ export default function App() {
         </View>
         <View style={styles.buttonRow}>
           <TouchableOpacity
-            style={styles.submitButton}
-            onPress={handleLogin}
+            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
+            onPress={handleSignUp}
             activeOpacity={0.7}
+            disabled={isLoading}
           >
-            <Text style={styles.submitButtonText}>Sign Up</Text>
+            <Text style={styles.submitButtonText}>
+              {isLoading ? "Signing Up..." : "Sign Up"}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
