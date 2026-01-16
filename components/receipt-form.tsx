@@ -7,7 +7,6 @@ import {
   Image,
   ScrollView,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
@@ -15,6 +14,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTransactionExtraction } from "@/hooks/useTransactionExtraction";
 import { useRouter } from "expo-router";
 import { useTransactionStore } from "@/store/transactionStore";
+import { launchCamera, launchImageLibrary } from "@/utils/imagePicker";
 
 export default function ReceiptForm() {
   const [selectedImage, setSelectedImage] =
@@ -24,40 +24,16 @@ export default function ReceiptForm() {
   const { addBulkTransactions } = useTransactionStore();
 
   const handleImagePick = async () => {
-    const permissionResult =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (!permissionResult.granted) {
-      Alert.alert("Permission to access camera roll is required!");
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      quality: 1,
-      allowsEditing: false,
-      aspect: [16, 9],
-    });
-
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0]);
+    const result = await launchImageLibrary();
+    if (result.success) {
+      setSelectedImage(result.asset);
     }
   };
 
   const handleCameraButtonPress = async () => {
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    if (!permissionResult.granted) {
-      Alert.alert("Permission to access camera is required!");
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ["images"],
-      quality: 1,
-      allowsEditing: false,
-      aspect: [16, 9],
-    });
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0]);
+    const result = await launchCamera();
+    if (result.success) {
+      setSelectedImage(result.asset);
     }
   };
 
