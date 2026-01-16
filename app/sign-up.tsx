@@ -13,7 +13,7 @@ import { authClient } from "../auth-client";
 import { theme, sharedStyles } from "@/utils/theme";
 import { useRouter } from "expo-router";
 
-export default function App() {
+export default function SignUp() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -21,7 +21,11 @@ export default function App() {
   const router = useRouter();
 
   const handleSignUp = async () => {
-    if (isLoading) return;
+    if (!name || !email || !password) {
+      Alert.alert("Validation Error", "Please fill in all fields");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -96,9 +100,7 @@ export default function App() {
             activeOpacity={0.7}
             disabled={isLoading}
           >
-            <Text style={styles.submitButtonText}>
-              {isLoading ? "Signing Up..." : "Sign Up"}
-            </Text>
+            <Text style={styles.submitButtonText}>Sign Up</Text>
           </TouchableOpacity>
         </View>
       </View>

@@ -20,7 +20,11 @@ export default function SignIn() {
   const router = useRouter();
 
   const handleLogin = async () => {
-    if (isLoading) return;
+    if (!email || !password) {
+      Alert.alert("Validation Error", "Please fill in all fields");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -82,9 +86,7 @@ export default function SignIn() {
             activeOpacity={0.7}
             disabled={isLoading}
           >
-            <Text style={styles.submitButtonText}>
-              {isLoading ? "Signing In..." : "Sign In"}
-            </Text>
+            <Text style={styles.submitButtonText}>Sign In</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.signUpPrompt}>
