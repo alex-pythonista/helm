@@ -36,7 +36,14 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to upload receipt images for transaction extraction.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to take photos of receipts for transaction extraction."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
