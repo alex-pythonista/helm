@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { theme, sharedStyles } from "@/utils/theme";
 import { authClient } from "@/auth-client";
@@ -15,13 +16,34 @@ import { useRouter } from "expo-router";
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async () => {
-    await authClient.signIn.email({
-      email,
-      password,
-    });
+    if (!email || !password) {
+      Alert.alert("Validation Error", "Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await authClient.signIn.email({
+        email,
+        password,
+      });
+
+      if (result.error) {
+        Alert.alert("Login Failed", result.error.message || "Please try again");
+        return;
+      }
+
+      router.replace("/");
+    } catch (error) {
+      Alert.alert("Error", "An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -59,9 +81,10 @@ export default function SignIn() {
         </View>
         <View style={styles.buttonRow}>
           <TouchableOpacity
-            style={styles.submitButton}
+            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
             onPress={handleLogin}
             activeOpacity={0.7}
+            disabled={isLoading}
           >
             <Text style={styles.submitButtonText}>Sign In</Text>
           </TouchableOpacity>
